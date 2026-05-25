@@ -2,13 +2,12 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <array>
 #include <memory>
+#include <array>
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
     explicit Session(boost::asio::ip::tcp::socket socket);
-
     void start();
 
 private:

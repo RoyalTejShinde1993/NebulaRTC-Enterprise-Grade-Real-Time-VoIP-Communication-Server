@@ -3,22 +3,19 @@
 #include "core/logger.hpp"
 
 #include <boost/asio.hpp>
-#include <openssl/ssl.h>
 #include <thread>
 #include <vector>
+#include <openssl/ssl.h>
 
 int main() {
     SSL_library_init();
 
-    constexpr unsigned short port = 5060;
-    constexpr int workers = 4;
-
     boost::asio::io_context io;
 
-    VoIPServer server(io, port);
+    VoIPServer server(io, 5060);
     server.start();
 
-    Logger::info("Server initialized successfully");
+    constexpr int workers = 4;
 
     std::vector<std::thread> pool;
 

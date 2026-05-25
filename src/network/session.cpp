@@ -1,6 +1,7 @@
 
 #include "network/session.hpp"
 #include "core/logger.hpp"
+#include "sip/sip_parser.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -22,21 +23,21 @@ void Session::read() {
                 std::string request(buffer_.data(), length);
                 process(request);
                 read();
-            } else {
-                Logger::error("Client Disconnected");
             }
-        });
+        }
+    );
 }
 
 void Session::process(const std::string& request) {
-    Logger::info("Received Request: " + request);
+    SIPParser parser;
+    auto msg = parser.parse(request);
 
-    if(request.find("INVITE") != std::string::npos) {
+    Logger::info("SIP Method: " + msg.method);
+
+    if(msg.method == "INVITE") {
         write("SIP/2.0 200 OK\r\n");
-    } else if(request.find("BYE") != std::string::npos) {
+    } else if(msg.method == "BYE") {
         write("SIP/2.0 200 BYE\r\n");
-    } else if(request.find("OPTIONS") != std::string::npos) {
-        write("SIP/2.0 200 OPTIONS\r\n");
     } else {
         write("SIP/2.0 400 BAD REQUEST\r\n");
     }
@@ -52,5 +53,6 @@ void Session::write(const std::string& response) {
             if(ec) {
                 Logger::error("Write Failed");
             }
-        });
+        }
+    );
 }

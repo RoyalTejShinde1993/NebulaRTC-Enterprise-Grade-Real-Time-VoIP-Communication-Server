@@ -9,7 +9,7 @@ VoIPServer::VoIPServer(boost::asio::io_context& io, unsigned short port)
     : acceptor_(io, tcp::endpoint(tcp::v4(), port)) {}
 
 void VoIPServer::start() {
-    Logger::info("VoIP Server Started");
+    Logger::info("NebulaRTC Server Started");
     accept();
 }
 
@@ -22,5 +22,6 @@ void VoIPServer::accept() {
             }
 
             accept();
-        });
+        }
+    );
 }

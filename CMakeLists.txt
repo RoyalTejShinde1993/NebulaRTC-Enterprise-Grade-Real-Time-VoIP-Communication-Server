@@ -1,10 +1,7 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-project(VoIPRTCServer
-    VERSION 2.0.0
-    DESCRIPTION "Enterprise Grade VoIP Real-Time Communication Server"
-    LANGUAGES CXX)
+project(NebulaRTC VERSION 2.0 LANGUAGES CXX)
 
 option(ENABLE_CPP17 "Enable C++17" OFF)
 option(ENABLE_CPP20 "Enable C++20" ON)
@@ -28,22 +25,39 @@ find_package(OpenSSL REQUIRED)
 
 include_directories(include)
 
+add_library(nebulartc_core
+    src/core/logger.cpp
+)
+
+add_library(nebulartc_sip
+    src/sip/sip_parser.cpp
+)
+
+add_library(nebulartc_media
+    src/media/media_session.cpp
+)
+
+add_library(nebulartc_network
+    src/network/server.cpp
+    src/network/session.cpp
+)
+
 add_executable(voip_server
     src/main.cpp
-    src/server.cpp
-    src/session.cpp
-    src/logger.cpp
+)
+
+target_link_libraries(nebulartc_network PUBLIC
+    nebulartc_core
+    nebulartc_sip
 )
 
 target_link_libraries(voip_server PRIVATE
+    nebulartc_core
+    nebulartc_sip
+    nebulartc_media
+    nebulartc_network
     Boost::system
     Boost::thread
     OpenSSL::SSL
     OpenSSL::Crypto
 )
-
-if(MSVC)
-    target_compile_options(voip_server PRIVATE /W4)
-else()
-    target_compile_options(voip_server PRIVATE -Wall -Wextra -pedantic)
-endif()
